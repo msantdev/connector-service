@@ -1,0 +1,88 @@
+openapi: 3.0.0
+
+info:
+  title: Connector Service API
+  description: API documentation for the Connector Service that interacts with Telegram.
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:3000
+    description: Local development server
+
+paths:
+  /webhook:
+    post:
+      summary: Handle incoming messages from Telegram
+      tags:
+        - Webhook
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TelegramMessage'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExpenseAddedResponse'
+        '403':
+          $ref: '#/components/responses/forbidden'
+
+components:
+  schemas:
+    ForbiddenError:
+      title: Authorization Error
+      type: object
+      properties:
+        message:
+          type: string
+          example: User not authorized
+    error:
+      title: Invalid Telegram Format
+      type: object
+    TelegramMessage:
+      type: object
+      properties:
+        message:
+          type: object
+          properties:
+            from:
+              type: object
+              properties:
+                id:
+                  type: string
+                username:
+                  type: string
+            text:
+              type: string
+    ExpenseAddedResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Education expense added ✅
+        status:
+          type: string
+          example: success
+  responses:
+    unauthorized:
+      description: User not authorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ForbiddenError'
+    forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ForbiddenError'
+    expenseAdded:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ExpenseAddedResponse'
